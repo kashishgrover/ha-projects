@@ -1,0 +1,26 @@
+{
+  "folders": [
+    {
+      "name": "ha-projects",
+      "path": "."
+    },
+    {
+      "name": "Mpy Remote Workspace",
+      "uri": "pico:"
+    }
+  ],
+  "settings": {
+    "editor.fontLigatures": true,
+    "editor.fontFamily": "FiraCode-Retina",
+    "editor.tabSize": 2,
+    "editor.detectIndentation": false,
+    "terminal.integrated.fontFamily": "FiraCode-Retina",
+    "workbench.colorCustomizations": {
+      "statusBar.background": "#200036",
+      "activityBar.background": "#200036"
+    },
+    "emmet.showExpandedAbbreviation": "never",
+    "bashIde.explainshellEndpoint": "http://localhost:5000",
+    "workbench.activityBar.orientation": "vertical",
+  }
+}
