@@ -22,5 +22,6 @@
     "emmet.showExpandedAbbreviation": "never",
     "bashIde.explainshellEndpoint": "http://localhost:5000",
     "workbench.activityBar.orientation": "vertical",
+    "micropico.syncFolder": "light-group-controller",
   }
 }
