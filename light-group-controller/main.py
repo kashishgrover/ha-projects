@@ -66,7 +66,7 @@ def main():
     
     # Main loop
     while True:
-        # mqtt.check()
+        mqtt.check()
         encoder.check()
         
         # Check if any batched updates need to be sent
