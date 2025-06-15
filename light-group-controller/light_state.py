@@ -1,7 +1,12 @@
 import time
+from config import AVAILABLE_SCENES
 
 class LightState:
-    def __init__(self, min_temp=200, max_temp=454, default_temp=370, step=10, on_state_change=None, batch_delay_ms=300):
+    # Mode constants
+    TEMPERATURE_MODE = 'temperature'
+    SCENES_MODE = 'scenes'
+    
+    def __init__(self, min_temp=200, max_temp=454, default_temp=370, step=10, on_state_change=None, on_scene_change=None, batch_delay_ms=300):
         """Initialize the light state with the specified parameters.
         
         Args:
@@ -10,6 +15,7 @@ class LightState:
             default_temp: Default color temperature
             step: Step size for temperature adjustments
             on_state_change: Callback for state changes
+            on_scene_change: Callback for scene changes
             batch_delay_ms: Delay in ms before sending updates (for batching)
         """
         self.on = True
@@ -18,7 +24,12 @@ class LightState:
         self.max_temp = max_temp
         self.step = step
         self.on_state_change = on_state_change
+        self.on_scene_change = on_scene_change
         self.batch_delay_ms = batch_delay_ms
+        
+        # Mode and scene state
+        self.current_mode = self.TEMPERATURE_MODE
+        self.current_scene_index = 0
         
         # Batching state
         self.last_change_time = 0
@@ -32,6 +43,25 @@ class LightState:
         self._notify_change(force=True)
         return self.on
     
+    def toggle_mode(self):
+        """Toggle between temperature and scenes mode."""
+        if self.current_mode == self.TEMPERATURE_MODE:
+            self.current_mode = self.SCENES_MODE
+            if self.on_scene_change:
+                self.on_scene_change(AVAILABLE_SCENES[self.current_scene_index])
+        else:
+            self.current_mode = self.TEMPERATURE_MODE
+            if self.on_state_change:
+                self.on_state_change(self.on, self.color_temp)
+        return self.current_mode
+    
+    def adjust(self, direction):
+        """Adjust either temperature or scene based on current mode."""
+        if self.current_mode == self.TEMPERATURE_MODE:
+            return self.adjust_temp(direction)
+        else:
+            return self.adjust_scene(direction)
+    
     def adjust_temp(self, direction):
         """Adjust the color temperature by the step size in the given direction."""
         self.color_temp += direction * self.step
@@ -39,6 +69,14 @@ class LightState:
         # Mark as pending but don't send immediately
         self._notify_change(force=False)
         return self.color_temp
+    
+    def adjust_scene(self, direction):
+        """Adjust the scene selection."""
+        num_scenes = len(AVAILABLE_SCENES)
+        self.current_scene_index = (self.current_scene_index + direction) % num_scenes
+        if self.on_scene_change:
+            self.on_scene_change(AVAILABLE_SCENES[self.current_scene_index])
+        return AVAILABLE_SCENES[self.current_scene_index]
     
     def update_from_external(self, on_state, color_temp):
         """Update state from external source (like MQTT)."""

@@ -21,6 +21,10 @@ def main():
     def publish_state_change(on_state, color_temp):
         if mqtt:
             mqtt.publish_state(on_state, color_temp)
+            
+    def publish_scene_change(scene_name):
+        if mqtt:
+            mqtt.publish_scene(scene_name)
     
     # Create light state controller with callback
     light_state = LightState(
@@ -29,6 +33,7 @@ def main():
         default_temp=config.DEFAULT_COLOR_TEMP,
         step=config.COLOR_TEMP_STEP,
         on_state_change=publish_state_change,
+        on_scene_change=publish_scene_change,
         batch_delay_ms=config.BATCH_DELAY_MS
     )
     
@@ -51,8 +56,9 @@ def main():
         clk_pin=config.ENCODER_CLK_PIN,
         dt_pin=config.ENCODER_DT_PIN,
         sw_pin=config.ENCODER_SW_PIN,
-        on_rotate=lambda direction: light_state.adjust_temp(direction) if light_state.on else None,
-        on_press=light_state.toggle
+        on_rotate=lambda direction: light_state.adjust(direction) if light_state.on else None,
+        on_press=light_state.toggle,
+        on_double_press=light_state.toggle_mode
     )
     
     # Signal that setup is complete by blinking the LED

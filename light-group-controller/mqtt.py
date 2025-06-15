@@ -25,6 +25,7 @@ class MqttLightSync:
         self.password = password
         self.state_topic = state_topic.encode()
         self.command_topic = config.MQTT_TOPIC_SET.encode()
+        self.scene_command_topic = config.MQTT_TOPIC_SCENE_SET.encode()
         self.on_update = on_update
         self.client = None
         self.ignore_next = False
@@ -104,8 +105,26 @@ class MqttLightSync:
             # Ignore the next message since we'll receive our own update
             self.ignore_next = True
             self.client.publish(self.command_topic, payload)
-            print("Published →", payload)
+            print("Published: ", payload)
         except Exception as e:
             print("MQTT publish error:", e)
             self.led.off()  # Indicate connection issue
+            self._try_reconnect()
+            
+    def publish_scene(self, scene_name):
+        """Publish scene activation to MQTT."""
+        if not self.client:
+            return
+            
+        payload = ujson.dumps({
+            "scene": scene_name
+        })
+        
+        try:
+            self.ignore_next = True
+            self.client.publish(self.scene_command_topic, payload)
+            print("Published scene: ", payload)
+        except Exception as e:
+            print("MQTT scene publish error:", e)
+            self.led.off()
             self._try_reconnect()
