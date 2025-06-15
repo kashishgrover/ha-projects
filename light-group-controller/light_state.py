@@ -28,7 +28,7 @@ class LightState:
         self.batch_delay_ms = batch_delay_ms
         
         # Mode and scene state
-        self.current_mode = self.TEMPERATURE_MODE
+        self.current_mode = self.SCENES_MODE
         self.current_scene_index = 0
         
         # Batching state
